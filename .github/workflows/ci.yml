@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  server-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: freto
+          POSTGRES_PASSWORD: freto_dev_password
+          POSTGRES_DB: freto
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_USER: freto
+          MYSQL_PASSWORD: freto_dev_password
+          MYSQL_DATABASE: freto_notifications
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mongo:
+        image: mongo:7
+        ports: ["27017:27017"]
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand(\"ping\")' --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      POSTGRES_URL: postgresql://freto:freto_dev_password@localhost:5432/freto
+      MYSQL_URL: mysql://freto:freto_dev_password@localhost:3306/freto_notifications
+      REDIS_URL: redis://localhost:6379
+      MONGO_URL: mongodb://localhost:27017/freto
+      JWT_SECRET: ci-test-secret
+      JWT_REFRESH_SECRET: ci-test-refresh-secret
+      PAYMENTS_WEBHOOK_SECRET: ci-test-webhook-secret
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - run: npm install
+
+      - name: Run server test suite
+        working-directory: server
+        run: node --experimental-vm-modules ../node_modules/.bin/jest --runInBand
+
+      - name: Verify migrations apply cleanly
+        working-directory: server
+        run: npm run db:migrate
+
+  client-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - run: npm install
+
+      - name: Build client
+        working-directory: client
+        run: npm run build

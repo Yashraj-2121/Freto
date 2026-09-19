@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#0B1522] text-slate-100 font-sans antialiased min-h-screen selection:bg-orange-500 selection:text-white;
+  }
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-xl bg-slate-900/80 border border-slate-700/80 px-4 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all duration-200 text-sm;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold px-5 py-2.5 shadow-lg shadow-orange-500/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none text-sm cursor-pointer;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-medium px-5 py-2.5 border border-slate-700 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-sm cursor-pointer;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-600/60 hover:border-orange-500/80 bg-slate-900/40 hover:bg-orange-500/10 text-slate-200 hover:text-orange-400 font-medium px-5 py-2.5 transition-all duration-200 text-sm cursor-pointer;
+  }
+  .card {
+    @apply rounded-2xl bg-slate-900/70 backdrop-blur-md border border-slate-800/80 p-6 shadow-xl;
+  }
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0B1522;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #F0740A;
+}

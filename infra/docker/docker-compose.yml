@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: freto-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: freto
+      POSTGRES_PASSWORD: freto_dev_password
+      POSTGRES_DB: freto
+    ports: ["5432:5432"]
+    volumes: ["freto_postgres_data:/var/lib/postgresql/data"]
+
+  mysql:
+    image: mysql:8.4
+    container_name: freto-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_USER: freto
+      MYSQL_PASSWORD: freto_dev_password
+      MYSQL_ROOT_PASSWORD: freto_root_password
+      MYSQL_DATABASE: freto_notifications
+    ports: ["3306:3306"]
+    volumes: ["freto_mysql_data:/var/lib/mysql"]
+
+  mongo:
+    image: mongo:7
+    container_name: freto-mongo
+    restart: unless-stopped
+    ports: ["27017:27017"]
+    volumes: ["freto_mongo_data:/data/db"]
+
+  redis:
+    image: redis:7-alpine
+    container_name: freto-redis
+    restart: unless-stopped
+    ports: ["6379:6379"]
+
+volumes:
+  freto_postgres_data:
+  freto_mysql_data:
+  freto_mongo_data:

@@ -1,0 +1,19 @@
+{
+  "name": "freto-mern",
+  "private": true,
+  "version": "1.0.0",
+  "description": "FRETO FreightFlow — Full-Stack Freight & Truck Booking Platform (MERN Stack: MongoDB + Express + React + Node.js)",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace server",
+    "dev:client": "npm run dev --workspace client",
+    "seed": "npm run seed --workspace server",
+    "build": "npm run build --workspace client"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
