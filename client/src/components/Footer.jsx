@@ -94,14 +94,24 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-          <p>© 2026 FRETO Logistics Network. All rights reserved.</p>
-          <div className="flex gap-4">
-            <span className="hover:text-slate-400 cursor-pointer">Privacy Policy</span>
-            <span>•</span>
-            <span className="hover:text-slate-400 cursor-pointer">Terms of Carriage</span>
-            <span>•</span>
-            <span className="hover:text-slate-400 cursor-pointer">Security</span>
+        <div className="mt-12 pt-8 border-t border-slate-900 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-500">
+          <div className="space-y-2">
+            <p className="font-semibold text-slate-400">FRETO Logistics Private Limited</p>
+            <p>123 Freight Avenue, Transport Hub</p>
+            <p>Mumbai, Maharashtra 400001, India</p>
+            <p>Email: support@freto.com | Phone: +91 98765 43210</p>
+          </div>
+          <div className="flex flex-col md:items-end justify-between">
+            <div className="flex flex-wrap gap-4 mb-4 md:mb-0">
+              <Link to="/legal/privacy" className="hover:text-slate-400 transition-colors">Privacy Policy</Link>
+              <span>•</span>
+              <Link to="/legal/terms" className="hover:text-slate-400 transition-colors">Terms of Carriage</Link>
+              <span>•</span>
+              <Link to="/legal/cookies" className="hover:text-slate-400 transition-colors">Cookie Policy</Link>
+              <span>•</span>
+              <Link to="/legal/refunds" className="hover:text-slate-400 transition-colors">Refunds & Cancellations</Link>
+            </div>
+            <p>© {new Date().getFullYear()} FRETO Logistics Network. All rights reserved.</p>
           </div>
         </div>
       </div>

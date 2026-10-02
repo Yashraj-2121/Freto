@@ -138,12 +138,12 @@ export default function HomePage() {
             <div className="text-xs text-slate-400 mt-1">Freight Consignments Moved</div>
           </div>
           <div className="card py-4 px-3 text-center">
-            <div className="text-2xl sm:text-3xl font-black text-emerald-400">99.4%</div>
-            <div className="text-xs text-slate-400 mt-1">On-Time Transit Rate</div>
+            <div className="text-2xl sm:text-3xl font-black text-emerald-400">24/7</div>
+            <div className="text-xs text-slate-400 mt-1">Live GPS Tracking</div>
           </div>
           <div className="card py-4 px-3 text-center">
-            <div className="text-2xl sm:text-3xl font-black text-white">50+</div>
-            <div className="text-xs text-slate-400 mt-1">Industrial Logistics Hubs</div>
+            <div className="text-2xl sm:text-3xl font-black text-white">100%</div>
+            <div className="text-xs text-slate-400 mt-1">Transparent Bidding</div>
           </div>
         </div>
       </section>

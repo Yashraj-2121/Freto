@@ -10,6 +10,8 @@ import MyLoadsPage from "./pages/MyLoadsPage.jsx";
 import FleetPage from "./pages/FleetPage.jsx";
 import MyBookingsPage from "./pages/MyBookingsPage.jsx";
 import TripTrackingPage from "./pages/TripTrackingPage.jsx";
+import LegalPage from "./pages/LegalPage.jsx";
+import CookieBanner from "./components/CookieBanner.jsx";
 
 export default function App() {
   return (
@@ -27,9 +29,11 @@ export default function App() {
             <Route path="/bookings" element={<MyBookingsPage />} />
             <Route path="/tracking" element={<TripTrackingPage />} />
             <Route path="/tracking/:tripId" element={<TripTrackingPage />} />
+            <Route path="/legal/:policyType" element={<LegalPage />} />
             <Route path="*" element={<HomePage />} />
           </Routes>
         </main>
+        <CookieBanner />
         <Footer />
       </div>
     </AuthProvider>
