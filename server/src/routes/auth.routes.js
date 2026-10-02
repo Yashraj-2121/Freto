@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { register, login, demoLogin, getMe } from "../controllers/authController.js";
-import { authenticate } from "../middleware/auth.js";
+import { requireAuth as authenticate } from "../middleware/supabaseAuth.js";
 
 const router = Router();
 

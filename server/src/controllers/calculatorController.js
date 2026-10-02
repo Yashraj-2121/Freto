@@ -39,14 +39,14 @@ const TRUCK_RATES = {
 
 export function calculateFreight(req, res) {
   try {
-    const { originCity, destinationCity, truckType, weightTons } = req.body;
+    const { originCity, destinationCity, truckType, weightTons, distanceKm: providedDistance } = req.body;
 
     if (!originCity || !destinationCity) {
       return res.status(400).json({ message: "Origin and Destination cities are required." });
     }
 
     const key = `${originCity}-${destinationCity}`;
-    const distanceKm = CITY_DISTANCES[key] || 650; // default estimated distance
+    const distanceKm = providedDistance ? Number(providedDistance) : (CITY_DISTANCES[key] || 650);
 
     const selectedType = TRUCK_RATES[truckType]
       ? truckType

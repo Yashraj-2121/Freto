@@ -1,24 +1,44 @@
-import { Booking } from "../models/Booking.js";
-import { Trip } from "../models/Trip.js";
-import { Truck } from "../models/Truck.js";
+import { supabaseAdmin } from "../config/supabase.js";
+
+function toCamel(obj) {
+  if (!obj) return null;
+  const result = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (key === 'id') result._id = value;
+    else {
+      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+      result[camelKey] = value;
+    }
+  }
+  return result;
+}
 
 export async function getBookings(req, res) {
   try {
     const { shipperId, transporterId, status } = req.query;
-    const filter = {};
+    const supabase = req.supabase || supabaseAdmin;
 
-    if (shipperId) filter.shipperId = shipperId;
-    if (transporterId) filter.transporterId = transporterId;
-    if (status) filter.status = status;
+    let query = supabase.from("bookings").select(`
+      *,
+      load:load_id (*),
+      truck:truck_id (*)
+    `).order('created_at', { ascending: false });
 
-    const bookings = await Booking.find(filter)
-      .populate("loadId")
-      .populate("shipperId", "name email phone companyName")
-      .populate("transporterId", "name email phone companyName")
-      .populate("truckId")
-      .sort({ createdAt: -1 });
+    if (shipperId) query = query.eq("shipper_id", shipperId);
+    if (transporterId) query = query.eq("transporter_id", transporterId);
+    if (status) query = query.eq("status", status);
 
-    res.json({ count: bookings.length, bookings });
+    const { data: bookings, error } = await query;
+    if (error) throw error;
+
+    const formattedBookings = bookings.map(b => {
+      const camelBooking = toCamel(b);
+      if (camelBooking.load) { camelBooking.loadId = toCamel(camelBooking.load); delete camelBooking.load; }
+      if (camelBooking.truck) { camelBooking.truckId = toCamel(camelBooking.truck); delete camelBooking.truck; }
+      return camelBooking;
+    });
+
+    res.json({ count: formattedBookings.length, bookings: formattedBookings });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch bookings", error: error.message });
   }
@@ -26,18 +46,23 @@ export async function getBookings(req, res) {
 
 export async function getBookingById(req, res) {
   try {
-    const booking = await Booking.findById(req.params.id)
-      .populate("loadId")
-      .populate("shipperId", "name email phone companyName city")
-      .populate("transporterId", "name email phone companyName city")
-      .populate("truckId");
+    const supabase = req.supabase || supabaseAdmin;
+    const { data: booking, error } = await supabase.from("bookings").select(`
+      *,
+      load:load_id (*),
+      truck:truck_id (*)
+    `).eq("id", req.params.id).single();
 
-    if (!booking) return res.status(404).json({ message: "Booking not found" });
+    if (error || !booking) return res.status(404).json({ message: "Booking not found" });
 
-    // Also look for associated trip
-    const trip = await Trip.findOne({ bookingId: booking._id });
+    // Look for associated trip
+    const { data: trip } = await supabase.from("trips").select("*").eq("booking_id", booking.id).single();
 
-    res.json({ booking, trip });
+    const camelBooking = toCamel(booking);
+    if (camelBooking.load) { camelBooking.loadId = toCamel(camelBooking.load); delete camelBooking.load; }
+    if (camelBooking.truck) { camelBooking.truckId = toCamel(camelBooking.truck); delete camelBooking.truck; }
+
+    res.json({ booking: camelBooking, trip: toCamel(trip) });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch booking details", error: error.message });
   }
@@ -46,27 +71,35 @@ export async function getBookingById(req, res) {
 export async function updateBookingStatus(req, res) {
   try {
     const { status, paymentStatus } = req.body;
-    const booking = await Booking.findById(req.params.id);
-    if (!booking) return res.status(404).json({ message: "Booking not found" });
+    const supabase = req.supabase || supabaseAdmin;
 
-    if (status) booking.status = status;
-    if (paymentStatus) booking.paymentStatus = paymentStatus;
+    const { data: booking, error: fetchErr } = await supabase.from("bookings").select("*").eq("id", req.params.id).single();
+    if (fetchErr || !booking) return res.status(404).json({ message: "Booking not found" });
+
+    const updateData = {};
+    if (status) updateData.status = status;
+    if (paymentStatus) updateData.payment_status = paymentStatus;
 
     if (status === "DELIVERED") {
-      booking.deliveredAt = new Date();
+      updateData.delivered_at = new Date();
       // Free up the truck
-      if (booking.truckId) {
-        await Truck.findByIdAndUpdate(booking.truckId, { status: "Available" });
+      if (booking.truck_id) {
+        await supabaseAdmin.from("trucks").update({ status: "Available" }).eq("id", booking.truck_id);
       }
       // Update trip
-      await Trip.findOneAndUpdate(
-        { bookingId: booking._id },
-        { status: "DELIVERED", progressPercent: 100, speedKmH: 0 }
-      );
+      await supabaseAdmin.from("trips").update({ 
+        status: "DELIVERED", 
+        progress_percent: 100, 
+        speed_km_h: 0 
+      }).eq("booking_id", booking.id);
     }
 
-    await booking.save();
-    res.json({ message: "Booking updated successfully", booking });
+    const { data: updatedBooking, error: updateErr } = await supabase.from("bookings")
+      .update(updateData).eq("id", req.params.id).select().single();
+      
+    if (updateErr) throw updateErr;
+
+    res.json({ message: "Booking updated successfully", booking: toCamel(updatedBooking) });
   } catch (error) {
     res.status(500).json({ message: "Failed to update booking", error: error.message });
   }

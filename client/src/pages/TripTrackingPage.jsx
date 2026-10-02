@@ -43,6 +43,7 @@ export default function TripTrackingPage() {
   const [loading, setLoading] = useState(true);
   const [simulating, setSimulating] = useState(false);
   const [statusNotice, setStatusNotice] = useState(null);
+  const [routePolyline, setRoutePolyline] = useState(null);
 
   useEffect(() => {
     fetchTrip();
@@ -55,11 +56,10 @@ export default function TripTrackingPage() {
         const { data } = await api.get(`/trips/${tripId}`);
         setTrip(data.trip);
       } else {
-        // Find default active trip from bookings
-        const { data } = await api.get("/bookings");
-        if (data.bookings.length > 0) {
-          const tripRes = await api.get(`/trips/booking/${data.bookings[0]._id}`);
-          setTrip(tripRes.data.trip);
+        // Find default active trip
+        const { data } = await api.get("/trips/mine");
+        if (data && data.length > 0) {
+          setTrip(data[0]);
         }
       }
     } catch (err) {
@@ -96,6 +96,22 @@ export default function TripTrackingPage() {
   const destPos = trip?.destinationCoordinates
     ? [trip.destinationCoordinates.lat, trip.destinationCoordinates.lng]
     : [28.6139, 77.209];
+
+  useEffect(() => {
+    if (trip && trip.originCoordinates && trip.destinationCoordinates && !routePolyline) {
+      const o = trip.originCoordinates;
+      const d = trip.destinationCoordinates;
+      fetch(`https://router.project-osrm.org/route/v1/driving/${o.lng},${o.lat};${d.lng},${d.lat}?overview=full&geometries=geojson`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.routes && data.routes.length > 0) {
+            const coords = data.routes[0].geometry.coordinates.map((c) => [c[1], c[0]]);
+            setRoutePolyline(coords);
+          }
+        })
+        .catch(err => console.error("OSRM fetch error", err));
+    }
+  }, [trip]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -197,11 +213,11 @@ export default function TripTrackingPage() {
 
               {/* Route Polyline */}
               <Polyline
-                positions={[originPos, truckPos, destPos]}
+                positions={routePolyline || [originPos, truckPos, destPos]}
                 color="#F0740A"
                 weight={4}
                 opacity={0.8}
-                dashArray="6, 8"
+                dashArray={routePolyline ? "" : "6, 8"}
               />
             </MapContainer>
 

@@ -4,9 +4,7 @@ import dotenv from "dotenv";
 import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 import { createApp } from "./app.js";
-import { connectDB } from "./config/db.js";
-import { User } from "./models/User.js";
-import { seedDatabase } from "./seeds/seed.js";
+// MongoDB imports removed
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
@@ -17,15 +15,8 @@ async function main() {
   console.log("🚚 Starting FRETO Freight & Truck Booking Server");
   console.log("==================================================");
 
-  // 1. Connect to MongoDB
-  await connectDB();
-
-  // 2. Auto-seed if database is empty
-  const userCount = await User.countDocuments();
-  if (userCount === 0) {
-    console.log("ℹ️ Empty database detected. Auto-seeding initial demo data...");
-    await seedDatabase();
-  }
+  // MongoDB has been removed! We now rely on Supabase.
+  console.log("ℹ️ Using Supabase Postgres for Database & Auth!");
 
   // 3. Create Express app & HTTP Server
   const app = createApp();

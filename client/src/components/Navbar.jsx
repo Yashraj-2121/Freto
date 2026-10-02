@@ -44,7 +44,9 @@ export default function Navbar() {
     if (user.role === "DRIVER") {
       return [
         { to: "/", label: "Home" },
-        { to: "/tracking", label: "Assigned Trip & GPS Navigation" },
+        { to: "/loads/browse", label: "Load Board" },
+        { to: "/fleet", label: "My Truck" },
+        { to: "/tracking", label: "Live GPS Navigation" },
       ];
     }
 

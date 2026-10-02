@@ -89,7 +89,16 @@ export default function HomePage() {
 
         {/* Dynamic Action Buttons based on User Role */}
         <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-          {!user || user.role === "SHIPPER" ? (
+          {!user ? (
+            <>
+              <Link to="/login" className="btn-primary text-base px-8 py-3.5">
+                📦 Book a Truck Now
+              </Link>
+              <Link to="/login" className="btn-secondary text-base px-7 py-3.5">
+                🗺️ Live GPS Tracking
+              </Link>
+            </>
+          ) : user.role === "SHIPPER" ? (
             <>
               <Link to="/loads/new" className="btn-primary text-base px-8 py-3.5">
                 📦 Book a Truck Now
@@ -184,10 +193,10 @@ export default function HomePage() {
               <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between">
                 <span className="text-sm font-semibold text-slate-200">{fleet.rate}</span>
                 <Link
-                  to={user?.role === "TRANSPORTER" ? "/fleet" : `/loads/new?type=${encodeURIComponent(fleet.name)}`}
+                  to={!user ? "/login" : user.role === "TRANSPORTER" ? "/fleet" : `/loads/new?type=${encodeURIComponent(fleet.name)}`}
                   className="text-xs text-orange-400 hover:text-orange-300 font-semibold"
                 >
-                  {user?.role === "TRANSPORTER" ? "Manage Fleet →" : "Book This Truck →"}
+                  {!user ? "Login to Book →" : user.role === "TRANSPORTER" ? "Manage Fleet →" : "Book This Truck →"}
                 </Link>
               </div>
             </div>
