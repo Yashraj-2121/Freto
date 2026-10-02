@@ -1,81 +1,71 @@
-# FRETO Demo App - Quick Start (2 Minutes)
+# FRETO Demo App - Quick Start
 
-## Option 1: Run Everything (Recommended)
+## Setup Guide
 
-### Terminal 1 - Start Databases
-```bash
-cd infra/docker
-docker-compose up -d
+### 1. Configure Supabase Environment
+
+You need a Supabase project. Create `.env` inside `/server`:
+```env
+SUPABASE_URL=your_project_url
+SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
 
-### Terminal 2 - Start Server
+Create `.env` inside `/client`:
+```env
+VITE_SUPABASE_URL=your_project_url
+VITE_SUPABASE_ANON_KEY=your_anon_key
+VITE_API_URL=http://localhost:8000/api
+```
+
+### 2. Install Dependencies
+
+```bash
+# Install root dependencies (if any)
+npm install
+
+# Install server dependencies
+cd server
+npm install
+
+# Install client dependencies
+cd ../client
+npm install
+```
+
+### 3. Run Development Servers
+
+**Terminal 1 - Start Server**
 ```bash
 cd server
 npm run dev
 ```
-Expected output: `FRETO API listening on :4000`
+Expected output: `FRETO Freight & Truck Booking Server listening on port 8000`
 
-### Terminal 3 - Start Client
+**Terminal 2 - Start Client**
 ```bash
 cd client
 npm run dev
 ```
-Expected output: `Local: http://localhost:3000/`
-
-## Option 2: Just Start (All in Docker)
-
-```bash
-docker-compose up -d
-npm install
-npm run dev:server &
-npm run dev:client
-```
+Expected output: `Local: http://localhost:5173/`
 
 ---
 
 ## What Works Now ✅
 
-- Phone OTP authentication
-- Load posting
-- Booking system
-- Real-time tracking (Socket.io)
-- Trip management
-- Admin dashboard
-- KYC submission
-- Real-time notifications
-
-## What Needs External Service
-
-- 💰 Payments (Razorpay - optional, works in test mode with dummy keys)
-- 📧 SMS/OTP (msg91 - optional, limited free SMS)
-- 📁 Document upload (S3 - optional, currently skipped)
+- **Supabase Authentication**: Secure email/password login and JWT management.
+- **Role-Based Access**: Dedicated dashboards for Shippers and Transporters/Drivers (Owner-Operators).
+- **Load Posting**: Shippers can post specific cargo requirements.
+- **Reverse Bidding**: Transporters bid on open loads with specific trucks.
+- **Booking & Invoicing**: Auto-generates GST transport invoices upon bid acceptance.
+- **OSRM GPS Tracking**: Live highway journey tracking featuring OpenStreetMap and OSRM curved road generation.
 
 ## Test Login
 
-1. Go to http://localhost:3000
-2. Enter phone: `+919876543210`
-3. Enter any 4-6 digit OTP code
-4. Select role: SHIPPER / TRANSPORTER / DRIVER
-5. Start using the app!
-
-## Useful Commands
-
-```bash
-# Check databases
-docker-compose ps
-
-# View logs
-docker-compose logs -f postgres
-
-# Stop everything
-docker-compose down
-
-# Run tests
-npm test --workspace server
-
-# Check API health
-curl http://localhost:4000/api/v1/health
-```
+1. Go to your local client URL (e.g. `http://localhost:5173`)
+2. Click **Sign In** and create a new account
+3. Select role: **SHIPPER** (to post loads) or **TRANSPORTER/DRIVER** (to add trucks and bid)
+4. Start using the app!
 
 ---
 
