@@ -6,13 +6,15 @@ import {
   updateTruck,
   deleteTruck,
 } from "../controllers/truckController.js";
+import { requireAuth } from "../middleware/supabaseAuth.js";
 
 const router = Router();
 
-router.get("/", getTrucks);
-router.get("/:id", getTruckById);
-router.post("/", createTruck);
-router.put("/:id", updateTruck);
-router.delete("/:id", deleteTruck);
+// Trucks can be browsed publicly if needed, but for security, we'll enforce auth
+router.get("/", requireAuth, getTrucks);
+router.get("/:id", requireAuth, getTruckById);
+router.post("/", requireAuth, createTruck);
+router.put("/:id", requireAuth, updateTruck);
+router.delete("/:id", requireAuth, deleteTruck);
 
 export default router;

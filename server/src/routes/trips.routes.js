@@ -10,8 +10,8 @@ import { requireAuth } from "../middleware/supabaseAuth.js";
 const router = Router();
 
 router.get("/mine", requireAuth, getMyTrips);
-router.get("/:id", getTripById);
-router.get("/booking/:bookingId", getTripByBooking);
-router.post("/:id/simulate", simulateTripStep);
+router.get("/:id", requireAuth, getTripById);
+router.get("/booking/:bookingId", requireAuth, getTripByBooking);
+router.post("/:id/simulate", requireAuth, simulateTripStep);
 
 export default router;

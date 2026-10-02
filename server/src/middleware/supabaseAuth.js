@@ -30,8 +30,22 @@ export const requireAuth = async (req, res, next) => {
     });
 
     next();
-  } catch (err) {
-    console.error("Auth Middleware Error:", err);
-    res.status(500).json({ message: "Internal Server Error", error: err.message });
+  } catch (error) {
+    console.error("Auth error:", error);
+    res.status(500).json({ message: "Internal server error during authentication" });
   }
+};
+
+// Role-based access control middleware
+export const requireRole = (allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized. Please log in." });
+    }
+    const userRole = req.user.user_metadata?.role;
+    if (!userRole || !allowedRoles.includes(userRole)) {
+      return res.status(403).json({ message: `Access denied. Requires one of: ${allowedRoles.join(', ')}` });
+    }
+    next();
+  };
 };

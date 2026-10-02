@@ -6,13 +6,14 @@ import {
   updateLoad,
   deleteLoad,
 } from "../controllers/loadController.js";
+import { requireAuth } from "../middleware/supabaseAuth.js";
 
 const router = Router();
 
-router.get("/", getLoads);
-router.get("/:id", getLoadById);
-router.post("/", createLoad);
-router.put("/:id", updateLoad);
-router.delete("/:id", deleteLoad);
+router.get("/", requireAuth, getLoads);
+router.get("/:id", requireAuth, getLoadById);
+router.post("/", requireAuth, createLoad);
+router.put("/:id", requireAuth, updateLoad);
+router.delete("/:id", requireAuth, deleteLoad);
 
 export default router;
