@@ -129,9 +129,11 @@ export default function FleetPage() {
           </p>
         </div>
 
-        <button onClick={() => setShowAddModal(true)} className="btn-primary text-xs">
-          + Add New Truck to Fleet
-        </button>
+        {user?.role !== 'DRIVER' && (
+          <button onClick={() => setShowAddModal(true)} className="btn-primary text-xs">
+            + Add New Truck to Fleet
+          </button>
+        )}
       </div>
 
       {/* Fleet Stats */}
@@ -229,12 +231,14 @@ export default function FleetPage() {
                       >
                         {truck.status === "Available" ? "Mark Maint." : "Mark Ready"}
                       </button>
-                      <button
-                        onClick={() => handleDeleteTruck(truck._id)}
-                        className="text-[11px] text-red-400 hover:text-red-300 px-2 py-1 rounded bg-red-950/40"
-                      >
-                        Delete
-                      </button>
+                      {user?.role !== 'DRIVER' && (
+                        <button
+                          onClick={() => handleDeleteTruck(truck._id)}
+                          className="text-[11px] text-red-400 hover:text-red-300 px-2 py-1 rounded bg-red-950/40"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -245,7 +249,7 @@ export default function FleetPage() {
       </div>
 
       {/* Add Truck Modal */}
-      {showAddModal && (
+      {showAddModal && user?.role !== 'DRIVER' && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="card max-w-lg w-full bg-slate-900 border-slate-700 p-6 space-y-5 animate-scaleUp">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -348,7 +352,10 @@ export default function FleetPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Driver Mobile No.</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">
+                    Driver Mobile No. 
+                    <span className="block text-[10px] text-slate-500 font-normal">Must match driver's FRETO account (e.g. 9811234567)</span>
+                  </label>
                   <input
                     type="text"
                     className="input"

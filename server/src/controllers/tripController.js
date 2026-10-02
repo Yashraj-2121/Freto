@@ -57,7 +57,8 @@ export async function getTripByBooking(req, res) {
 
 export async function getMyTrips(req, res) {
   try {
-    const supabase = req.supabase || supabaseAdmin;
+    const userRole = req.user?.user_metadata?.role;
+    const supabase = userRole === "DRIVER" ? supabaseAdmin : (req.supabase || supabaseAdmin);
     const userPhone = req.user?.user_metadata?.phone;
     const userId = req.user?.sub || req.user?.id;
 
@@ -120,7 +121,9 @@ export async function getMyTrips(req, res) {
 // Live simulation step: move truck forward towards destination
 export async function simulateTripStep(req, res) {
   try {
-    const supabase = req.supabase || supabaseAdmin;
+    const userRole = req.user?.user_metadata?.role;
+    const supabase = userRole === "DRIVER" ? supabaseAdmin : (req.supabase || supabaseAdmin);
+    
     const { data: trip, error: fetchErr } = await supabase.from("trips").select("*").eq("id", req.params.id).single();
     if (fetchErr || !trip) return res.status(404).json({ message: "Trip not found." });
 

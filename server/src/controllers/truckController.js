@@ -17,8 +17,28 @@ function toCamel(obj) {
 export async function getTrucks(req, res) {
   try {
     const { transporterId, status, city, type } = req.query;
-    const supabase = req.supabase || supabaseAdmin;
+    const userRole = req.user?.user_metadata?.role;
+    
+    // DRIVERS see only trucks assigned to their registered phone number
+    if (userRole === "DRIVER") {
+      const phone = req.user?.user_metadata?.phone;
+      if (!phone) {
+        return res.json({ count: 0, trucks: [] });
+      }
+      const phoneDigits = phone.replace(/\D/g, '').slice(-10);
+      const query = supabaseAdmin
+        .from("trucks")
+        .select("*")
+        .like("driver_phone", `%${phoneDigits}%`)
+        .order('created_at', { ascending: false });
+        
+      const { data: trucks, error } = await query;
+      if (error) throw error;
+      return res.json({ count: trucks.length, trucks: trucks.map(toCamel) });
+    }
 
+    // TRANSPORTERS see their own trucks via RLS
+    const supabase = req.supabase || supabaseAdmin;
     let query = supabase.from("trucks").select("*").order('created_at', { ascending: false });
 
     if (transporterId) query = query.eq("transporter_id", transporterId);
@@ -100,7 +120,20 @@ export async function createTruck(req, res) {
 
 export async function updateTruck(req, res) {
   try {
-    const supabase = req.supabase || supabaseAdmin;
+    const userRole = req.user?.user_metadata?.role;
+    let supabase = req.supabase || supabaseAdmin;
+    let authFilters = {};
+
+    if (userRole === "DRIVER") {
+      // Drivers bypass RLS but we strictly enforce it belongs to their phone
+      supabase = supabaseAdmin;
+      const phone = req.user?.user_metadata?.phone;
+      if (!phone) return res.status(403).json({ message: "No phone number attached to driver profile" });
+      const phoneDigits = phone.replace(/\D/g, '').slice(-10);
+      authFilters.driver_phone = phoneDigits; // Note: For exact matches this assumes standard format, but in Postgres we can use like.
+      // Wait, Supabase js update().eq doesn't easily let us use `like` dynamically before update.
+      // Since it's a direct API call by ID, we'll just verify the truck's driver_phone first.
+    }
     
     // Map any incoming camelCase body fields to snake_case for Postgres
     const updateData = { ...req.body };
@@ -111,6 +144,20 @@ export async function updateTruck(req, res) {
     if (updateData.driverPhone) { updateData.driver_phone = updateData.driverPhone; delete updateData.driverPhone; }
     if (updateData.currentCity) { updateData.current_city = updateData.currentCity; delete updateData.currentCity; }
     
+    // If DRIVER, verify ownership first
+    if (userRole === "DRIVER") {
+        const { data: existing } = await supabase.from("trucks").select("driver_phone").eq("id", req.params.id).single();
+        if (!existing) return res.status(404).json({ message: "Truck not found" });
+        const existingDigits = (existing.driver_phone || "").replace(/\D/g, '').slice(-10);
+        const myDigits = (req.user?.user_metadata?.phone || "").replace(/\D/g, '').slice(-10);
+        if (existingDigits !== myDigits) return res.status(403).json({ message: "Unauthorized: Not your truck" });
+        
+        // Don't let drivers change who the truck belongs to or the base rate
+        delete updateData.base_rate_per_km;
+        delete updateData.driver_phone;
+        delete updateData.driver_name;
+    }
+
     const { data: truck, error } = await supabase.from("trucks").update(updateData).eq("id", req.params.id).select().single();
     
     if (error || !truck) return res.status(404).json({ message: "Truck not found or unauthorized" });
