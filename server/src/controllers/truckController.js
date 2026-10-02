@@ -66,7 +66,7 @@ export async function createTruck(req, res) {
 
     const supabase = req.supabase || supabaseAdmin;
     // req.user.sub is the Supabase Auth UUID
-    let transporterId = req.user ? req.user.sub : req.body.transporterId;
+    let transporterId = req.user ? (req.user.sub || req.user.id) : req.body.transporterId;
     
     if (!transporterId) {
       return res.status(401).json({ message: "You must be logged in to create a truck." });

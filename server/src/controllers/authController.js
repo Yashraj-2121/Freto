@@ -98,7 +98,7 @@ export async function getMe(req, res) {
     const u = req.user;
     res.json({
       user: {
-        id: u.sub,
+        id: u.sub || u.id,
         email: u.email,
         role: u.user_metadata?.role,
         name: u.user_metadata?.name,
