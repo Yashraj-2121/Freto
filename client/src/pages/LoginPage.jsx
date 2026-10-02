@@ -13,6 +13,8 @@ export default function LoginPage() {
   const [companyName, setCompanyName] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
 
   const navigate = useNavigate();
   const { setAuthSession, quickDemoLogin } = useAuth();
@@ -30,6 +32,36 @@ export default function LoginPage() {
       else navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSendOtp(e) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      const { data } = await api.post("/auth/otp/send", { email });
+      setOtpSent(true);
+      setError(data.message); // Temporarily show success message in error box (or add a success state)
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleVerifyOtp(e) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      const { data } = await api.post("/auth/otp/verify", { email, otp });
+      setAuthSession(data.token, data.user);
+      navigate("/");
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid OTP");
     } finally {
       setLoading(false);
     }
@@ -136,28 +168,39 @@ export default function LoginPage() {
         </div>
 
         {/* Tab switch between Login & Register */}
-        <div className="flex border-b border-slate-800 text-xs font-semibold">
+        <div className="flex border-b border-slate-800 text-[11px] sm:text-xs font-semibold">
           <button
             type="button"
-            onClick={() => setTab("login")}
-            className={`flex-1 py-2.5 text-center border-b-2 transition-colors ${
+            onClick={() => { setTab("login"); setOtpSent(false); }}
+            className={`flex-1 py-3 text-center border-b-2 transition-colors ${
               tab === "login"
                 ? "border-orange-500 text-orange-400"
                 : "border-transparent text-slate-400 hover:text-white"
             }`}
           >
-            Sign In with Email
+            Password
+          </button>
+          <button
+            type="button"
+            onClick={() => { setTab("otp"); setOtpSent(false); }}
+            className={`flex-1 py-3 text-center border-b-2 transition-colors ${
+              tab === "otp"
+                ? "border-orange-500 text-orange-400"
+                : "border-transparent text-slate-400 hover:text-white"
+            }`}
+          >
+            Email OTP
           </button>
           <button
             type="button"
             onClick={() => setTab("register")}
-            className={`flex-1 py-2.5 text-center border-b-2 transition-colors ${
+            className={`flex-1 py-3 text-center border-b-2 transition-colors ${
               tab === "register"
                 ? "border-orange-500 text-orange-400"
                 : "border-transparent text-slate-400 hover:text-white"
             }`}
           >
-            Create New Account
+            Register
           </button>
         </div>
 
@@ -198,6 +241,54 @@ export default function LoginPage() {
               {loading ? "Signing in..." : "Sign In to FRETO"}
             </button>
           </form>
+        ) : tab === "otp" ? (
+          /* OTP Form */
+          <div className="space-y-4">
+            {!otpSent ? (
+              <form onSubmit={handleSendOtp} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    className="input"
+                    placeholder="Enter your registered email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <p className="text-[10px] text-slate-500 mt-1">We will send a 6-digit OTP to this email.</p>
+                </div>
+                <button type="submit" disabled={loading} className="btn-primary w-full py-3">
+                  {loading ? "Sending OTP..." : "Send Email OTP"}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Enter 6-Digit OTP</label>
+                  <input
+                    type="text"
+                    className="input text-center text-xl tracking-[0.5em] font-mono placeholder:tracking-normal"
+                    placeholder="------"
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    required
+                  />
+                </div>
+                <button type="submit" disabled={loading} className="btn-primary w-full py-3 bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20">
+                  {loading ? "Verifying..." : "Verify & Log In"}
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setOtpSent(false)} 
+                  className="w-full text-xs text-slate-400 hover:text-white py-2"
+                >
+                  ← Use a different email
+                </button>
+              </form>
+            )}
+          </div>
         ) : (
           /* Register Form */
           <form onSubmit={handleRegister} className="space-y-3.5">

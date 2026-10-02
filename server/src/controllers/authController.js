@@ -110,3 +110,63 @@ export async function getMe(req, res) {
     res.status(500).json({ message: "Failed to fetch profile", error: error.message });
   }
 }
+
+export async function sendOtp(req, res) {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "Email is required." });
+    }
+
+    const { error } = await supabasePublic.auth.signInWithOtp({
+      email: email.toLowerCase(),
+      options: {
+        shouldCreateUser: false, // Only allow login for existing users
+      },
+    });
+
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    res.json({ message: "OTP sent successfully to your email." });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to send OTP", error: error.message });
+  }
+}
+
+export async function verifyOtp(req, res) {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required." });
+    }
+
+    const { data, error } = await supabasePublic.auth.verifyOtp({
+      email: email.toLowerCase(),
+      token: otp,
+      type: "email",
+    });
+
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired OTP." });
+    }
+
+    const token = data.session.access_token;
+
+    res.json({
+      message: "Login successful",
+      token,
+      user: {
+        id: data.user.id,
+        name: data.user.user_metadata?.name,
+        email: data.user.email,
+        role: data.user.user_metadata?.role,
+        companyName: data.user.user_metadata?.companyName,
+        phone: data.user.user_metadata?.phone,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to verify OTP", error: error.message });
+  }
+}
