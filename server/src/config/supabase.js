@@ -1,4 +1,4 @@
-import { createAdminClient, createContextClient } from "@supabase/serv..er/core";
+import { createAdminClient, createContextClient } from "@supabase/server/core";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
