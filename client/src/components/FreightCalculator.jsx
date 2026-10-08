@@ -65,9 +65,9 @@ export default function FreightCalculator() {
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-400 text-xs font-semibold mb-2">
               ⚡ Instant Estimate Tool
             </div>
-            <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Freight & Truck Rate Calculator
-            </h3>
+            </h2>
             <p className="text-xs sm:text-sm text-slate-400">
               Compute transparent point-to-point road freight rates, toll estimates, and fuel cost
             </p>
@@ -78,10 +78,11 @@ export default function FreightCalculator() {
         <form onSubmit={handleCalculate} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Pickup City */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label htmlFor="originCity" className="block text-xs font-medium text-slate-300 mb-1">
               📍 Origin / Pickup City
             </label>
             <select
+              id="originCity"
               value={originCity}
               onChange={(e) => setOriginCity(e.target.value)}
               className="input bg-slate-950"
@@ -96,10 +97,11 @@ export default function FreightCalculator() {
 
           {/* Delivery City */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label htmlFor="destinationCity" className="block text-xs font-medium text-slate-300 mb-1">
               🎯 Destination City
             </label>
             <select
+              id="destinationCity"
               value={destinationCity}
               onChange={(e) => setDestinationCity(e.target.value)}
               className="input bg-slate-950"
@@ -114,10 +116,11 @@ export default function FreightCalculator() {
 
           {/* Truck Type */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label htmlFor="truckType" className="block text-xs font-medium text-slate-300 mb-1">
               🚛 Recommended Truck
             </label>
             <select
+              id="truckType"
               value={truckType}
               onChange={(e) => setTruckType(e.target.value)}
               className="input bg-slate-950"
@@ -132,11 +135,12 @@ export default function FreightCalculator() {
 
           {/* Weight */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label htmlFor="weightTons" className="block text-xs font-medium text-slate-300 mb-1">
               ⚖️ Cargo Weight (Tons)
             </label>
             <div className="flex gap-2">
               <input
+                id="weightTons"
                 type="number"
                 step="0.1"
                 min="0.5"

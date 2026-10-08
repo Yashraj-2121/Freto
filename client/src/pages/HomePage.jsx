@@ -219,7 +219,7 @@ export default function HomePage() {
               <div className="h-12 w-12 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center text-xl font-black mx-auto">
                 1
               </div>
-              <h4 className="font-bold text-white text-base">Post Your Freight</h4>
+              <h3 className="font-bold text-white text-base">Post Your Freight</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Specify pickup, drop city, cargo weight, and truck type in seconds.
               </p>
@@ -229,7 +229,7 @@ export default function HomePage() {
               <div className="h-12 w-12 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center text-xl font-black mx-auto">
                 2
               </div>
-              <h4 className="font-bold text-white text-base">Direct Fleet Quotes</h4>
+              <h3 className="font-bold text-white text-base">Direct Fleet Quotes</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Verified transporters submit competitive bids with their assigned trucks and drivers.
               </p>
@@ -239,7 +239,7 @@ export default function HomePage() {
               <div className="h-12 w-12 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center text-xl font-black mx-auto">
                 3
               </div>
-              <h4 className="font-bold text-white text-base">Confirmed Booking</h4>
+              <h3 className="font-bold text-white text-base">Confirmed Booking</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Accept the best bid, generate a legal GST road transport invoice, and confirm dispatch.
               </p>
@@ -249,7 +249,7 @@ export default function HomePage() {
               <div className="h-12 w-12 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center text-xl font-black mx-auto">
                 4
               </div>
-              <h4 className="font-bold text-white text-base">Satellite GPS Tracking</h4>
+              <h3 className="font-bold text-white text-base">Satellite GPS Tracking</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Monitor the vehicle traveling on the OpenStreetMap route until safe arrival and delivery.
               </p>

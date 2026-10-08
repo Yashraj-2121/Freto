@@ -172,22 +172,20 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => { setTab("login"); setOtpSent(false); }}
-            className={`flex-1 py-3 text-center border-b-2 transition-colors ${
-              tab === "login"
+            className={`flex-1 py-3 text-center border-b-2 transition-colors ${tab === "login"
                 ? "border-orange-500 text-orange-400"
                 : "border-transparent text-slate-400 hover:text-white"
-            }`}
+              }`}
           >
             Sign In with Email
           </button>
           <button
             type="button"
             onClick={() => setTab("register")}
-            className={`flex-1 py-3 text-center border-b-2 transition-colors ${
-              tab === "register"
+            className={`flex-1 py-3 text-center border-b-2 transition-colors ${tab === "register"
                 ? "border-orange-500 text-orange-400"
                 : "border-transparent text-slate-400 hover:text-white"
-            }`}
+              }`}
           >
             Create New Account
           </button>
@@ -307,11 +305,11 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-start gap-2 pt-1 pb-2">
-              <input 
-                type="checkbox" 
-                id="consent" 
-                required 
-                className="mt-1 accent-orange-500 rounded border-slate-700 bg-slate-900 cursor-pointer" 
+              <input
+                type="checkbox"
+                id="consent"
+                required
+                className="mt-1 accent-orange-500 rounded border-slate-700 bg-slate-900 cursor-pointer"
               />
               <label htmlFor="consent" className="text-xs text-slate-400 leading-tight">
                 I agree to the FRETO <a href="/legal/terms" target="_blank" rel="noreferrer" className="text-orange-500 hover:underline">Terms & Conditions</a>, <a href="/legal/privacy" target="_blank" rel="noreferrer" className="text-orange-500 hover:underline">Privacy Policy</a>, and consent to the collection of my personal and location data as described.

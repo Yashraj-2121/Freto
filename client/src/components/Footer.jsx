@@ -94,7 +94,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-slate-900 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-500">
+        <div className="mt-12 pt-8 border-t border-slate-900 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-400">
           <div className="space-y-2">
             <p className="font-semibold text-slate-400">FRETO Logistics Private Limited</p>
             <p>123 Freight Avenue, Transport Hub</p>

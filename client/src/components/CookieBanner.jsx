@@ -31,7 +31,7 @@ export default function CookieBanner() {
           </div>
           <button
             onClick={handleAccept}
-            className="w-full sm:w-auto px-6 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-500/20 transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+            className="w-full sm:w-auto px-6 py-2.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold rounded-lg shadow-lg shadow-orange-500/20 transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-slate-900"
           >
             I Accept
           </button>
