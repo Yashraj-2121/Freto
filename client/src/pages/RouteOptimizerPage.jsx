@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client.js";
+import { solveRouteLocally } from "../utils/localOptimizer.js";
 
 const DEFAULT_CITIES = [
   "Mumbai",
@@ -61,18 +62,25 @@ export default function RouteOptimizerPage() {
     async function checkStatus() {
       try {
         const res = await api.get("/optimizer/status");
-        setEngineStatus({ checking: false, online: res.data.online, details: res.data });
-      } catch (err) {
-        // Fallback check directly to localhost:5050
+        if (res.data?.online) {
+          setEngineStatus({ checking: false, online: true, isLocalCs: true, details: res.data });
+          return;
+        }
+      } catch (err) {}
+
+      // Fallback check directly to localhost:5050 if running on localhost
+      if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
         try {
           const direct = await fetch("http://localhost:5050/api/optimizer/health");
           if (direct.ok) {
-            setEngineStatus({ checking: false, online: true, direct: true });
+            setEngineStatus({ checking: false, online: true, isLocalCs: true, direct: true });
             return;
           }
         } catch (_) {}
-        setEngineStatus({ checking: false, online: false, error: err.message });
       }
+
+      // Cloud deployment (Netlify) or local C# offline: use hybrid solver
+      setEngineStatus({ checking: false, online: true, isLocalCs: false, isCloudSolver: true });
     }
     checkStatus();
   }, []);
@@ -139,29 +147,41 @@ export default function RouteOptimizerPage() {
     };
 
     try {
-      // 1. Try via Express Backend Proxy
-      let data;
-      try {
-        const response = await api.post("/optimizer/route", payload);
-        data = response.data;
-      } catch (proxyErr) {
-        // 2. Direct fallback to C# microservice port 5050
-        const directRes = await fetch("http://localhost:5050/api/optimizer/route", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!directRes.ok) throw new Error("C# engine responded with status " + directRes.status);
-        data = await directRes.json();
+      let data = null;
+
+      // 1. If running on localhost, attempt connection to C# microservice or Express proxy
+      const isLocal = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+      if (isLocal) {
+        try {
+          const response = await api.post("/optimizer/route", payload);
+          data = response.data;
+        } catch (proxyErr) {
+          try {
+            const directRes = await fetch("http://localhost:5050/api/optimizer/route", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            if (directRes.ok) {
+              data = await directRes.json();
+            }
+          } catch (_) {}
+        }
+      }
+
+      // 2. If C# service is offline or app is running on cloud (Netlify HTTPS), use the high-speed hybrid solver
+      if (!data) {
+        data = solveRouteLocally(payload);
       }
 
       setResult(data);
-      setEngineStatus({ checking: false, online: true });
+      setError(null);
     } catch (err) {
       console.error("Optimization failed:", err);
-      setError(
-        "Could not reach C# Route Optimization Engine. Please ensure it is running via 'npm run dev:optimizer' (listening on http://localhost:5050)."
-      );
+      // Seamlessly fall back to client solver
+      const fallbackData = solveRouteLocally(payload);
+      setResult(fallbackData);
+      setError(null);
     } finally {
       setLoading(false);
     }
@@ -188,27 +208,29 @@ export default function RouteOptimizerPage() {
         <div className="flex items-center gap-3">
           <div
             className={`px-3.5 py-1.5 rounded-xl border text-xs font-medium flex items-center gap-2 ${
-              engineStatus.online
+              engineStatus.isLocalCs
                 ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                : "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                : "bg-orange-500/10 border-orange-500/30 text-orange-400"
             }`}
           >
             <span
               className={`w-2 h-2 rounded-full ${
-                engineStatus.online ? "bg-emerald-400" : "bg-amber-400"
+                engineStatus.isLocalCs ? "bg-emerald-400" : "bg-orange-400 animate-pulse"
               }`}
             />
-            {engineStatus.online ? "C# Engine Online (Port 5050)" : "C# Engine Offline"}
+            {engineStatus.isLocalCs
+              ? "C# .NET Engine Connected (Port 5050)"
+              : "Hybrid Engine Active (Cloud Mode)"}
           </div>
 
           <a
-            href="http://localhost:5050/swagger"
+            href={typeof window !== "undefined" && window.location.hostname === "localhost" ? "http://localhost:5050/swagger" : "https://github.com/Yashraj-2121/Freto/tree/main/services/Freto.RouteOptimizer"}
             target="_blank"
             rel="noopener noreferrer"
             className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5"
             title="Inspect interactive OpenAPI/Swagger Documentation"
           >
-            <span>📜 Swagger Docs</span>
+            <span>📜 {typeof window !== "undefined" && window.location.hostname === "localhost" ? "Swagger Docs" : "C# Service Code"}</span>
           </a>
         </div>
       </div>
@@ -469,6 +491,14 @@ export default function RouteOptimizerPage() {
 
           {result && (
             <div className="space-y-6 animate-fadeIn">
+              {result.isLocalFallback && (
+                <div className="p-3.5 rounded-xl bg-orange-500/10 border border-orange-500/25 text-orange-300 text-xs flex items-center gap-2">
+                  <span className="text-base">⚡</span>
+                  <div>
+                    <span className="font-semibold text-white">Cloud Deployment Mode:</span> Optimized using the In-Browser Engine (executing the exact same TSP 2-Opt & Branch-and-Bound algorithms as our C# backend). In local development, it communicates with the C# .NET 8 microservice at <code>http://localhost:5050</code>.
+                  </div>
+                </div>
+              )}
               {/* Savings Highlight Banner */}
               {result.savings?.distanceSavedKm > 0 && (
                 <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-emerald-900/40 to-slate-900 border border-emerald-500/40 shadow-xl">
