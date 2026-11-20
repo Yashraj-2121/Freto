@@ -3,6 +3,10 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Ensure service listens on port 5050 by default
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5050";
+builder.WebHost.UseUrls($"http://localhost:{port}");
+
 // 1. Add Services & Dependency Injection
 builder.Services.AddSingleton<ICityRegistry, CityRegistry>();
 builder.Services.AddSingleton<ICostCalculationService, CostCalculationService>();
