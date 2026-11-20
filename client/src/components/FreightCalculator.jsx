@@ -72,7 +72,16 @@ export default function FreightCalculator() {
               Compute transparent point-to-point road freight rates, toll estimates, and fuel cost
             </p>
           </div>
-          <span className="text-xs text-slate-500 font-mono">Live Pricing Engine v2.4</span>
+          <div className="flex flex-col items-end gap-1">
+            <span className="text-xs text-slate-500 font-mono">Live Pricing Engine v2.4</span>
+            <Link
+              to="/optimizer"
+              className="text-xs font-semibold text-orange-400 hover:text-orange-300 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1"
+            >
+              <span>⚡ Multi-Stop Optimizer (C#)</span>
+              <span>→</span>
+            </Link>
+          </div>
         </div>
 
         <form onSubmit={handleCalculate} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -10,6 +10,9 @@
   "scripts": {
     "dev:server": "npm run dev --workspace server",
     "dev:client": "npm run dev --workspace client",
+    "dev:optimizer": "dotnet run --project services/Freto.RouteOptimizer",
+    "build:optimizer": "dotnet build services/Freto.RouteOptimizer",
+    "test:optimizer": "dotnet test services/Freto.RouteOptimizer.Tests",
     "seed": "npm run seed --workspace server",
     "db:view": "node server/src/scripts/viewDb.js",
     "build": "npm run build --workspace client"

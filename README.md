@@ -36,24 +36,25 @@ FRETO enforces strict role-based access control and user navigation:
                        │               REACT 18 SINGLE PAGE APP                   │
                        │   (Tailwind CSS + Leaflet OpenStreetMap + Axios Client)  │
                        └────────────────────────────┬─────────────────────────────┘
-                                                    │  HTTP / RESTful JSON + Supabase JWT
+                                                    │  HTTP / RESTful JSON
                                                     ▼
                        ┌──────────────────────────────────────────────────────────┐
                        │               NODE.JS + EXPRESS.JS SERVER                │
                        │   (Routes + Supabase Auth Middleware + OSRM Integration) │
                        └──────────────┬─────────────────────────────┬─────────────┘
                                       │                             │
-                                      ▼                             ▼
+                                      ▼ (Proxy / REST)              ▼
                        ┌──────────────────────────────┐    ┌──────────────────────┐
-                       │    SUPABASE POSTGRESQL       │    │     SUPABASE AUTH    │
-                       │  (RLS Policies, Foreign Keys)│    │   (JWTs & Sessions)  │
+                       │ C# .NET ROUTE OPTIMIZER      │    │  SUPABASE POSTGRESQL │
+                       │ (TSP 2-Opt, Fleet Bin-Pack)  │    │  (RLS Policies, Auth)│
                        └──────────────────────────────┘    └──────────────────────┘
 ```
 
 | Layer | Technology | Role |
 |---|---|---|
-| **Frontend** | React 18, Vite, Tailwind CSS | Responsive web portal with dynamic calculator, role-filtered dashboard, and Leaflet map |
-| **Backend** | Node.js, Express.js, Supabase JS | REST API controllers, state transitions, authentication validation |
+| **Frontend** | React 18, Vite, Tailwind CSS | Responsive web portal, dynamic calculator, multi-stop route optimizer UI, and Leaflet map |
+| **Backend** | Node.js, Express.js, Supabase JS | REST API controllers, state transitions, authentication validation, optimizer proxy |
+| **Optimization Engine** | C# (.NET 8 LTS), ASP.NET Core | High-performance multi-stop Traveling Salesperson (TSP) & Capacitated Fleet (CVRP) optimizer with Swagger UI |
 | **Database** | Supabase (PostgreSQL) | Fully relational storage with Row Level Security (RLS) and cascading deletes |
 | **Mapping** | Leaflet & OSRM API | Highway coordinates and curved road polyline generation |
 
@@ -101,33 +102,51 @@ cd client
 npm run dev
 ```
 
+### 5. Start the C# Route Optimization Microservice (Optional / On-Demand)
+In a third terminal:
+```bash
+npm run dev:optimizer
+# Or run with dotnet directly:
+dotnet run --project services/Freto.RouteOptimizer
+```
+- Interactive Swagger UI: `http://localhost:5050/swagger`
+- Route Optimizer Web Page: `http://localhost:5173/optimizer`
+- Run C# Unit Tests: `npm run test:optimizer`
+
 ---
 
 ## 📁 Repository Structure
 
 ```text
 freto/
-├── server/                    # Node.js + Express REST API
+├── services/
+│   ├── Freto.RouteOptimizer/       # C# .NET 8 ASP.NET Core Web API
+│   │   ├── Controllers/           # OptimizerController.cs
+│   │   ├── Models/                # LocationPoint, RouteLeg, OptimizationResult
+│   │   ├── Services/              # CityRegistry, RouteOptimizerService, CostCalculator
+│   │   └── Program.cs             # ASP.NET Core Pipeline & Swagger
+│   └── Freto.RouteOptimizer.Tests/# xUnit C# Unit Test Suite
+├── server/                        # Node.js + Express REST API
 │   ├── src/
-│   │   ├── config/            # Supabase Client Initialization
-│   │   ├── controllers/       # Business logic & state transitions
-│   │   ├── middleware/        # Supabase JWT decoding & validation
-│   │   ├── routes/            # REST API route declarations
-│   │   ├── app.js             # Express application configuration
-│   │   └── index.js           # Server bootstrap
+│   │   ├── config/                # Supabase Client Initialization
+│   │   ├── controllers/           # Business logic & optimizer proxy
+│   │   ├── middleware/            # Supabase JWT decoding & validation
+│   │   ├── routes/                # REST API route declarations
+│   │   ├── app.js                 # Express application configuration
+│   │   └── index.js               # Server bootstrap
 │   └── package.json
-├── client/                    # React (Vite) Single Page Application
+├── client/                        # React (Vite) Single Page Application
 │   ├── src/
-│   │   ├── components/        # Navbar, Footer, FreightCalculator
-│   │   ├── context/           # Supabase AuthContext
-│   │   ├── pages/             # Home, BookTruck, Marketplace, Fleet,
-│   │   │                      # Bookings, LiveTracking, Login
-│   │   ├── api/client.js      # Axios HTTP client
-│   │   ├── App.jsx            # Routing & Layout
-│   │   └── index.css          # Tailwind CSS design system
-│   ├── index.html             # HTML shell with Leaflet CDN
+│   │   ├── components/            # Navbar, Footer, FreightCalculator
+│   │   ├── context/               # Supabase AuthContext
+│   │   ├── pages/                 # Home, RouteOptimizerPage, BookTruck, Marketplace, Fleet,
+│   │   │                          # Bookings, LiveTracking, Login
+│   │   ├── api/client.js          # Axios HTTP client
+│   │   ├── App.jsx                # Routing & Layout
+│   │   └── index.css              # Tailwind CSS design system
+│   ├── index.html                 # HTML shell with Leaflet CDN
 │   └── package.json
-└── package.json               # Root workspace scripts
+└── package.json                   # Root workspace scripts (dev:server, dev:client, dev:optimizer)
 ```
 
 ---

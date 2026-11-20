@@ -11,3 +11,14 @@ dist/
 freto-mern-final.zip
 .vscode/
 .idea/
+
+# .NET build artifacts
+bin/
+**/bin/
+obj/
+**/obj/
+*.user
+*.suo
+.vs/
+TestResults/
+**/TestResults/

@@ -17,6 +17,7 @@ export default function Navbar() {
         { to: "/", label: "Home" },
         { to: "/loads/browse", label: "Freight Marketplace" },
         { to: "/fleet", label: "Fleet Catalog" },
+        { to: "/optimizer", label: "Route Optimizer (C#)" },
         { to: "/tracking", label: "Live Tracking" },
       ];
     }
@@ -25,6 +26,7 @@ export default function Navbar() {
       return [
         { to: "/", label: "Home" },
         { to: "/loads/new", label: "Book a Truck" },
+        { to: "/optimizer", label: "Route Optimizer (C#)" },
         { to: "/loads/mine", label: "My Loads & Quotes" },
         { to: "/bookings", label: "Bookings & Invoices" },
         { to: "/tracking", label: "Live GPS Tracking" },
@@ -35,6 +37,7 @@ export default function Navbar() {
       return [
         { to: "/", label: "Home" },
         { to: "/loads/browse", label: "Freight Marketplace" },
+        { to: "/optimizer", label: "Route Optimizer (C#)" },
         { to: "/fleet", label: "My Fleet" },
         { to: "/bookings", label: "Active Bookings" },
         { to: "/tracking", label: "Live GPS Tracking" },
@@ -45,6 +48,7 @@ export default function Navbar() {
       return [
         { to: "/", label: "Home" },
         { to: "/loads/browse", label: "Load Board" },
+        { to: "/optimizer", label: "Route Optimizer (C#)" },
         { to: "/fleet", label: "My Truck" },
         { to: "/tracking", label: "Live GPS Navigation" },
       ];
@@ -53,6 +57,7 @@ export default function Navbar() {
     // Default fallback
     return [
       { to: "/", label: "Home" },
+      { to: "/optimizer", label: "Route Optimizer (C#)" },
       { to: "/tracking", label: "Live Tracking" },
     ];
   };

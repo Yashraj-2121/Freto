@@ -1,0 +1,6 @@
+@Freto.RouteOptimizer_HostAddress = http://localhost:5161
+
+GET {{Freto.RouteOptimizer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

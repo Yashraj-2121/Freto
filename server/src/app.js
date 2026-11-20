@@ -12,6 +12,7 @@ import bookingsRoutes from "./routes/bookings.routes.js";
 import tripsRoutes from "./routes/trips.routes.js";
 import calculatorRoutes from "./routes/calculator.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import optimizerRoutes from "./routes/optimizer.routes.js";
 
 export function createApp() {
   const app = express();
@@ -72,6 +73,7 @@ export function createApp() {
   app.use("/api/bookings", bookingsRoutes);
   app.use("/api/trips", tripsRoutes);
   app.use("/api/calculator", calculatorRoutes);
+  app.use("/api/optimizer", optimizerRoutes);
   app.use("/api/admin", adminRoutes);
 
   // 404 handler for API routes
